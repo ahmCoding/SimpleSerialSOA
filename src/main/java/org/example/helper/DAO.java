@@ -2,6 +2,7 @@ package org.example.helper;
 
 import org.example.dataStructures.WDI;
 
+import java.util.Arrays;
 import java.util.List;
 import java.io.StringWriter;
 
@@ -49,9 +50,7 @@ public class DAO {
             wdi = dataset.get(idx);
             if ((wdi.getCountryCode().equals(codCountry)) && (wdi.getIndicatorCode().equals(codIndicator)))
                 break;
-        }
-        if (wdi == null) {
-            return null;
+            idx++;
         }
         StringWriter writer = new StringWriter();
         writer.write(codCountry);
@@ -68,5 +67,59 @@ public class DAO {
         return writer.toString();
     }
 
+    /**
+     * Funktion zur Abfrage von einem Indikator-Wert zu einem Land für ein bestimmtes Jahr
+     *
+     * @param codCountry
+     * @param codIndicator
+     * @param year
+     * @return String mit den Daten in Form von "Land;Indikator;Jahr;Wert"
+     * @throws Exception
+     */
+    public String query(String codCountry, String codIndicator, short year) throws Exception {
+        WDI wdi = null;
+        for (WDI sample : dataset) {
+            wdi = sample;
+            if ((wdi.getCountryCode().equals(codCountry)) && (wdi.getIndicatorCode().equals(codIndicator))) {
+                break;
+            }
+        }
+        StringWriter writer = new StringWriter();
+        writer.write(codCountry);
+        writer.write(";");
+        writer.write(codIndicator);
+        writer.write(";");
+        writer.write("" + year);
+        writer.write(";");
+        writer.write(wdi.getValue(year).toString());
+        return writer.toString();
+    }
+
+    /**
+     * Funktion zur Erstellung eines Berichts für mit dem Mittelwert eines Indikators für alle Länder
+     *
+     * @param codIndicator
+     * @return String mit den Daten in Form von "codeIndicator; countryCode; meanValue"
+     */
+    public String report(String codIndicator) {
+
+        StringWriter writer = new StringWriter();
+        writer.write(codIndicator);
+        writer.write(";");
+        for (WDI wdi : dataset) {
+            if (wdi.getIndicatorCode().equals(codIndicator)) {
+                Double[] years = wdi.getValues();
+                // ohne stream API und mit for-loop, ist es bei serial version effizienter
+                double sum = 0;
+                for (Double year : years) sum += year;
+                double mean = sum / years.length;
+                writer.write(wdi.getCountryCode());
+                writer.write(";");
+                writer.write("" + mean);
+                writer.write(";");
+            }
+        }
+        return writer.toString();
+    }
 
 }
