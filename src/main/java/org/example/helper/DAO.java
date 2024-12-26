@@ -1,14 +1,12 @@
 package org.example.helper;
 
-import org.example.dataStructures.WDI;
+import org.example.dataStructures.wdi.WDI;
 
-import java.util.Arrays;
 import java.util.List;
 import java.io.StringWriter;
 
 /**
- * Klasse zur Verwaltung von Daten
- * Diese Klasse ist als Singleton implementiert
+ * Klasse zur Verwaltung von Daten. Diese Klasse ist als Singleton implementiert
  */
 public class DAO {
 
@@ -32,6 +30,11 @@ public class DAO {
         return dao;
     }
 
+    /**
+     * Funktion zur Rückgabe des Datensatzes
+     *
+     * @return Liste von WDI-Objekten
+     */
     public List<WDI> getDataset() {
         return dataset;
     }
@@ -45,12 +48,11 @@ public class DAO {
      */
     public String query(String codCountry, String codIndicator) {
         WDI wdi = null;
-        int idx = 0;
-        while (idx < dataset.size()) {
-            wdi = dataset.get(idx);
+        for (WDI sample : dataset) {
+            if (sample == null) continue;
+            wdi = sample;
             if ((wdi.getCountryCode().equals(codCountry)) && (wdi.getIndicatorCode().equals(codIndicator)))
                 break;
-            idx++;
         }
         StringWriter writer = new StringWriter();
         writer.write(codCountry);
@@ -76,9 +78,10 @@ public class DAO {
      * @return String mit den Daten in Form von "Land;Indikator;Jahr;Wert"
      * @throws Exception
      */
-    public String query(String codCountry, String codIndicator, short year) throws Exception {
+    public String query(String codCountry, String codIndicator, short year) throws IllegalArgumentException {
         WDI wdi = null;
         for (WDI sample : dataset) {
+            if (sample == null) continue;
             wdi = sample;
             if ((wdi.getCountryCode().equals(codCountry)) && (wdi.getIndicatorCode().equals(codIndicator))) {
                 break;
@@ -96,7 +99,7 @@ public class DAO {
     }
 
     /**
-     * Funktion zur Erstellung eines Berichts für mit dem Mittelwert eines Indikators für alle Länder
+     * Funktion zur Erstellung eines Berichts für mit dem Mittelwert eines Indikators für alle Länder über alle Jahre
      *
      * @param codIndicator
      * @return String mit den Daten in Form von "codeIndicator; countryCode; meanValue"
@@ -107,12 +110,17 @@ public class DAO {
         writer.write(codIndicator);
         writer.write(";");
         for (WDI wdi : dataset) {
+            if (wdi == null) continue;
             if (wdi.getIndicatorCode().equals(codIndicator)) {
-                Double[] years = wdi.getValues();
+                Double[] ValueOfyears = wdi.getValues();
                 // ohne stream API und mit for-loop, ist es bei serial version effizienter
                 double sum = 0;
-                for (Double year : years) sum += year;
-                double mean = sum / years.length;
+                int nonZeroEntry = 0;
+                for (Double value : ValueOfyears) {
+                    sum += value;
+                    if (value != 0.0d) nonZeroEntry++;
+                }
+                double mean = sum / nonZeroEntry;
                 writer.write(wdi.getCountryCode());
                 writer.write(";");
                 writer.write("" + mean);

@@ -1,4 +1,4 @@
-package org.example.dataStructures;
+package org.example.dataStructures.wdi;
 
 /**
  * Klasse zur Repräsentation von einem Daten-Punkt/ Zeile in dem Datensatz "World Development Indicators (WDI) 1960-2023",
@@ -121,7 +121,7 @@ public class WDI {
         values[62] = getValue(data[66]);
     }
 
-    public Double getValue(short year) {
+    public Double getValue(short year) throws IllegalArgumentException {
         if (year >= FIRST_YEAR && year <= LAST_YEAR) {
             return values[year - FIRST_YEAR];
         } else {
