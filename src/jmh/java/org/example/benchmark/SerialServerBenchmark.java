@@ -93,7 +93,7 @@ public class SerialServerBenchmark {
         Collection<RunResult> results = new Runner(opt).run();
         // Shutdown server after benchmarks
         System.out.println("Benchmarks complete, shutting down server...");
-        System.out.println("Results saved to: " + resultsFile + ".json and " + resultsFile + ".csv");
+        System.out.println("Results saved to: " + resultsFile + ".json ");
         Thread shutdownThread = new Thread(new Client(DAO.getDao(), true));
         shutdownThread.start();
     }

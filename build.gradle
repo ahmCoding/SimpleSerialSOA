@@ -22,7 +22,7 @@ dependencies {
 sourceSets {
     jmh {
         java {
-            srcDirs = ['src/jmh/java']
+            srcDirs = ['src/jmh/java', 'src/main/java']
         }
     }
 }
@@ -34,6 +34,15 @@ jmh {
     resultFormat = 'JSON'
     resultsFile = project.file("${buildDir}/reports/jmh/results.json")
 }
+
+tasks.register('runServer', JavaExec) {
+    group = 'Application'
+    description = 'Starts the SOA server application.'
+    mainClass = 'org.example.serialServer.Server'
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
 
 test {
     useJUnitPlatform()
