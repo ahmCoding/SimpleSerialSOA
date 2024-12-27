@@ -21,20 +21,31 @@ public class Client implements Runnable {
 
     private final DAO dao;
     private final Random random;
+    private boolean shutdownServer;
 
-    public Client() {
-        dao = DAO.getDao();
+    public Client(DAO daoToset, boolean shutdownServer) {
+        dao = daoToset;
         random = new Random();
+        this.shutdownServer = shutdownServer;
+    }
+
+    public Client(DAO daoToset) {
+        dao = daoToset;
+        random = new Random();
+        this.shutdownServer = false;
     }
 
     @Override
     public void run() {
-        List<WDI> data = dao.getDataset();
-
-        for (int i = 0; i < QUERY_ITERATIONS; i++) {
-            executeQueryBatch(data);
-            executeReportQuery(data);
+        if (!shutdownServer) {
+            List<WDI> data = dao.getDataset();
+            for (int i = 0; i < QUERY_ITERATIONS; i++) {
+                executeQueryBatch(data);
+                executeReportQuery(data);
+            }
+            return;
         }
+        executeShutdownCommand();
     }
 
     private WDI getRandomWDI(List<WDI> data) {
@@ -47,6 +58,10 @@ public class Client implements Runnable {
 
     private String buildReportCommand(WDI wdi) {
         return String.format("r;%s", wdi.getIndicatorCode());
+    }
+
+    private String buildShutdownCommand() {
+        return "z";
     }
 
     /**
@@ -77,6 +92,15 @@ public class Client implements Runnable {
             String command = buildQueryCommand(randomWdi);
             executeCommand(command);
         }
+    }
+
+    /**
+     * Führt den Shutdown-Befehl auf dem Server aus.
+     */
+    private void executeShutdownCommand() {
+        String command = buildShutdownCommand();
+        executeCommand(command);
+
     }
 
     /**

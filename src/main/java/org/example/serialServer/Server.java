@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -14,7 +15,7 @@ public class Server {
     public static void main(String[] arg) {
         boolean stopServer = false;
         System.out.println("Initialization completed.");
-        try (ServerSocket serverSocket = new ServerSocket(Config.SERIAL_PORT)) {
+        try (ServerSocket serverSocket = new ServerSocket(Config.SERIAL_PORT, 50, InetAddress.getByName("127.0.0.1"))) {
             do {
                 try (Socket clientSocket = serverSocket.accept();
                      PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
